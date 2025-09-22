@@ -2,25 +2,90 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.xsd"> 
-    <modelVersion>4.0</modelVersion> 
-    <groupId>com.library..</groupId> 
-    <artifactId>Book Metro Ticket</artifactId> 
-    <version>1.0SNAPSHOT</version> 
-    <packaging>warfile</packaging> 
+    <modelVersion>4.0.0</modelVersion> 
+    <groupId>com.library</groupId> 
+    <artifactId>BookMetroTicket</artifactId> 
+    <version>1.0.0-SNAPSHOT</version> 
+    <packaging>war</packaging> 
 
     <dependencies>
         <!-- Servlet API -->
         <dependency>
-            <groupId></groupId>
+            <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.one</version> 
-            <scope>providd</scope> 
+            <version>4.0.1</version> 
+            <scope>provided</scope> 
         </dependency>
+        <dependency>
+    		<groupId>com.mysql</groupId>
+    		<artifactId>mysql-connector-j</artifactId>
+    		<version>8.0.33</version>
+		</dependency>
 
                
     </dependencies>
+ 
+    <properties>
+        
+        <db.url>jdbc:mysql://localhost:3306/dev_db</db.url>
+        <db.username>root</db.username>
+        <db.password>devpass</db.password>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <db.url>jdbc:mysql://localhost:3306/dev_db</db.url>
+                <db.username>root</db.username>
+                <db.password>devpass</db.password>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <db.url>jdbc:mysql://prod-server:3306/prod_db</db.url>
+                <db.username>produser</db.username>
+                <db.password>prodpass</db.password>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <finalName>BookMetroTicket</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <webappDirectory>${project.build.directory}/webapp</webappDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+        <resources>
+    		<resource>
+        		<directory>src/main/resources</directory>
+        		<filtering>true</filtering>
+    		</resource>
+		</resources>
+
     </build>
 </project>
+
+<!--you add a new dependency for mysql connector in pom.xmk ,but not dowbloading .which cmd will you run to force maven to update the dependencies -->
+<!--you want to skip running tests during the build process for faster deployment. which maven cmd will u use? --> 
+<!-- The metro boking system reqires different database settings for dev and prod. how do you configure maven to hadle this?-->
+<!-- you update pom.xml ,but maven is still using old cached dependencies .how do clear local repositery cache?-->
+<!-- yur metro booking system build is failing with the error 'plugin org.apche.aven:maven-compiler-plugin not fund ".how will u fix this?-->

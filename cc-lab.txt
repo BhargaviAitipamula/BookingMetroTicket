@@ -1,0 +1,995 @@
+PART 1 — Create Linux EC2 & Connect Using PuTTY (.ppk)
+🔹 A. Create Ubuntu EC2
+
+Go to AWS Console
+
+Go to EC2 → Launch Instance
+
+Name: Linux-EC2
+
+AMI: Choose Ubuntu
+
+Instance type: t2.micro
+
+Key pair:
+
+Create new key pair
+
+Download .pem file
+
+Network settings:
+
+Allow SSH (Port 22)
+
+Source: My IP
+
+Click Launch
+
+Wait until instance state = Running.
+
+🔹 B. VERY IMPORTANT — Check Security Group
+
+Go to:
+
+EC2 → Security Groups → Inbound Rules
+
+Make sure:
+
+Type: SSH
+
+Port: 22
+
+Source: My IP
+
+If not → Add rule.
+
+🔹 C. Convert .pem to .ppk (Only for Windows)
+
+PuTTY cannot use .pem directly.
+
+Open PuTTYgen
+
+Click Load
+
+Select your .pem
+
+Click Save Private Key
+
+Save as .ppk
+
+Done.
+
+🔹 D. Connect Using PuTTY
+
+Open PuTTY
+
+Host Name:
+
+ubuntu@<Public-IP>
+
+Example:
+
+ubuntu@3.xx.xx.xx
+
+Go to:
+Connection → SSH → Auth → Credentials
+
+Click Browse
+
+Select your .ppk
+
+Click Open
+
+Click Yes (first time warning)
+
+You are connected 🎉
+
+🔹 VERIFY
+
+Type:
+
+whoami
+
+Output:
+
+ubuntu
+
+Done Linux via PuTTY ✅
+
+✅ PART 2 — Connect Using AWS CloudShell
+
+This is easier.
+
+Click CloudShell icon (top right terminal icon)
+
+Open EC2 → Select instance → Click Connect
+
+Go to SSH client tab
+
+Copy this command:
+
+ssh -i key.pem ubuntu@public-ip
+
+Paste in CloudShell
+
+❌ It fails because key not uploaded.
+
+Fix:
+
+In CloudShell → Click Upload
+
+Upload your .pem
+
+Run command again
+
+Now it connects ✅
+
+✅ PART 3 — Windows EC2 + RDP
+
+This is very easy.
+
+🔹 Step 1: Launch Windows Instance
+
+EC2 → Launch Instance
+
+Choose:
+
+Windows Server 2019 / 2022
+
+Instance type: t2.micro
+
+Allow:
+
+RDP (Port 3389)
+
+Source: My IP
+
+Select key pair
+
+Launch
+
+🔹 Step 2: Get Password
+
+Select instance
+
+Click Connect
+
+Go to RDP Client
+
+Click Get Password
+
+Upload .pem
+
+Click Decrypt
+
+Copy password.
+
+🔹 Step 3: Connect Using Remote Desktop
+
+On your Windows system:
+
+Press Win + R
+
+Type:
+
+mstsc
+
+Enter Public IP
+
+Username: Administrator
+
+Paste password
+
+Connected 🎉
+
+📘 WEEK 4 – Amazon S3
+
+This week has 3 parts:
+
+1️⃣ Create Bucket + Public Access
+2️⃣ Versioning + Cross Region Replication
+3️⃣ Static Website Hosting
+
+We’ll go step by step.
+
+🔹 PART 1 — Create S3 Bucket & Enable Public Access
+✅ Step 1: Create Bucket
+
+Go to AWS Console
+
+Go to S3
+
+Click Create bucket
+
+Fill:
+
+Bucket name: minniee-public-bucket-123
+(must be globally unique)
+
+Region: Same as your EC2 region
+
+Click Next until you see:
+
+🔥 Step 2: Disable Block Public Access (VERY IMPORTANT)
+
+You’ll see:
+
+“Block all public access”
+
+❌ Uncheck ALL options
+
+✔ Tick “I acknowledge”
+
+Click Create bucket.
+
+🔹 Step 3: Upload Object
+
+Open the bucket
+
+Go to Objects tab
+
+Click Upload
+
+Add any file (image/pdf)
+
+Click Upload
+
+🔥 Step 4: Enable Public Access (Object Level)
+
+Click uploaded file
+
+Go to Permissions
+
+Scroll to ACL
+
+Click Edit
+
+Under Public access:
+
+✔ Everyone → Read
+
+Save changes.
+✅ PART 1 — Create Bucket + Public Access
+🔹 Step 1: Create Bucket
+
+S3 → Create bucket
+
+Bucket name → must be globally unique
+
+Region → choose nearest
+
+Block Public Access → ❌ Uncheck all
+
+✔ Acknowledge
+
+Click Create.
+
+🔹 Step 2: Enable Bucket-Level Public Access
+
+Bucket → Permissions → ACL → Edit
+
+✔ Everyone → Read
+
+Save.
+
+🔹 Step 3: Upload File
+
+Objects → Upload → Add file → Upload
+
+🔹 Step 4: Enable Object-Level Public Access
+
+Click file → Permissions → ACL → Edit
+
+✔ Everyone → Read
+
+Save.
+
+🔹 Step 5: Verify
+
+Copy Object URL
+Open in Incognito
+
+If file opens → Success ✅
+🔹 Step 5: Test
+
+Copy Object URL
+Open in Incognito
+
+If file opens → Success ✅
+
+Enable Versioning
+
+Bucket → Properties → Bucket Versioning → Enable → Save
+✅ PART 3 — Cross Region Replication (CRR)
+
+CRR = Copy objects automatically to another region.
+
+🔥 IMPORTANT PREREQUISITE
+
+✔ Versioning enabled in BOTH buckets
+✔ Buckets must be in DIFFERENT regions
+
+🔹 Steps
+
+Create Destination Bucket (different region)
+
+Enable versioning in destination
+
+Source bucket → Management → Replication rules → Create rule
+
+Choose:
+
+Apply to all objects
+
+Use AWS-managed role
+
+Select destination bucket
+
+Save
+
+🔹 Test
+
+Upload file in source bucket
+Go to destination bucket
+
+File appears automatically
+✅ PART 4 — Static Website Hosting
+
+Host HTML website inside S3.
+
+🔹 Step 1: Create Bucket
+
+Uncheck Block Public Access.
+
+🔹 Step 2: Upload
+
+Upload:
+
+index.html
+
+error.html
+
+🔹 Step 3: Enable Static Website
+
+Bucket → Properties → Static website hosting → Enable
+
+Enter:
+
+Index document → index.html
+
+Error document → error.html
+
+Save.
+
+🔹 Step 4: Enable ACL
+
+Bucket-level:
+✔ Everyone → Read
+
+Object-level (for both files):
+✔ Everyone → Read
+
+🔹 Step 5: Access Website
+
+Copy:
+Bucket website endpoint
+
+Open in browser.
+
+If invalid URL → error.html loads.
+fix bucket policy {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+    }
+  ]
+}
+🌿 WEEK 3 – Amazon EFS (Shared Storage)
+🧠 What is EFS?
+
+EFS = Elastic File System
+
+👉 Shared storage
+👉 Multiple EC2 instances can access same files
+👉 Uses NFS (port 2049)
+
+🔥 PART 1 — Create 2 EC2 Instances
+✅ Step 1: Launch First EC2
+
+Name: EFS-1
+
+AMI: Amazon Linux (important)
+
+Instance type: t2.micro
+
+Key pair: select existing
+
+Security group:
+
+SSH (22) → My IP
+
+Add rule:
+
+Type: NFS
+
+Port: 2049
+
+Source: 0.0.0.0/0 (lab purpose)
+
+Launch.
+
+✅ Step 2: Launch Second EC2
+
+Same configuration.
+
+Name: EFS-2
+
+Make sure both are:
+
+✔ Running
+✔ 2/2 checks passed
+
+🔥 PART 2 — Create EFS File System
+✅ Step 3: Create EFS
+
+Go to EFS service
+
+Click Create file system
+
+Choose default VPC
+
+Click Next until Review
+
+Create
+
+Important:
+Make sure security group attached allows NFS (2049).
+
+🔥 PART 3 — Connect to EC2 & Mount EFS
+
+Now open 2 terminals (PuTTY or CloudShell).
+
+✅ Step 4: SSH into EFS-1
+ssh -i key.pem ec2-user@public-ip
+
+Become root:
+
+sudo su
+✅ Step 5: Install EFS Utils
+yum install -y amazon-efs-utils
+✅ Step 6: Create Mount Directory
+mkdir /efs
+✅ Step 7: Attach EFS
+
+Go to:
+
+EFS → Click your file system → Click Attach
+
+Copy mount command (DNS method)
+
+It will look like:
+
+mount -t efs fs-xxxx:/ /efs
+
+Paste in terminal.
+
+🔥 PART 4 — Test Shared Storage
+
+On EFS-1:
+
+cd /efs
+touch testfile.txt
+
+Now go to EFS-2:
+
+Repeat:
+
+sudo su
+yum install -y amazon-efs-utils
+mkdir /efs
+mount -t efs fs-xxxx:/ /efs
+cd /efs
+ls
+
+You should see:
+
+testfile.txt
+
+🎉 Shared storage working.
+💾 WEEK 2 – EBS (Ultra Clear Version)
+
+This week has 3 parts:
+
+1️⃣ Create & Attach Volume
+2️⃣ Permanently Mount (fstab)
+3️⃣ Snapshot → Copy to another region
+
+🔥 PART 1 – Create & Attach EBS
+✅ Step 1 – Create Volume
+
+EC2 → Volumes → Create Volume
+
+Type → gp3
+
+Size → 20GB
+
+AZ → SAME as EC2
+
+Click Create.
+
+⚠️ Volume & EC2 must be in same AZ.
+
+✅ Step 2 – Attach Volume
+
+Select volume → Actions → Attach
+
+Select EC2 instance
+
+Device name → /dev/xvdf
+
+Attach.
+
+✅ Step 3 – Verify in EC2
+
+SSH into instance:
+
+lsblk
+
+You will see something like:
+
+/dev/nvme0n1 → root
+
+/dev/nvme1n1 → new disk
+
+Remember:
+Console shows /dev/xvdf
+But Linux shows nvme1n1.
+
+🔥 PART 2 – Permanent Mount (Important)
+
+This is the main exam part.
+
+✅ Step 4 – Partition
+sudo fdisk /dev/nvme1n1
+
+Inside fdisk:
+
+n
+p
+Enter
+Enter
+Enter
+w
+
+Then:
+
+sudo partprobe
+✅ Step 5 – Format
+sudo mkfs.xfs /dev/nvme1n1p1
+✅ Step 6 – Create Mount Folder
+sudo mkdir /mnt/data
+✅ Step 7 – Mount
+sudo mount /dev/nvme1n1p1 /mnt/data
+
+Check:
+
+df -h
+✅ Step 8 – Make Permanent (VERY IMPORTANT)
+
+Get UUID:
+
+sudo blkid /dev/nvme1n1p1
+
+Copy UUID.
+
+Edit fstab:
+
+sudo nano /etc/fstab
+
+Add line:
+
+UUID=your-uuid /mnt/data xfs defaults,nofail 0 0
+
+Save.
+
+Test:
+
+sudo mount -a
+✅ Step 9 – Reboot Test
+sudo reboot
+
+After reconnect:
+
+df -h
+
+If mounted automatically → Success.
+
+🔥 PART 3 – Scale Instance (CPU/RAM)
+
+EC2 → Instance
+
+Stop instance.
+
+Actions → Instance settings → Change instance type.
+
+Choose bigger type (like t2.small).
+
+Start instance.
+
+Done.
+
+🔥 PART 4 – Snapshot & Copy Region
+✅ Create Snapshot
+
+EC2 → Volumes → Select volume → Create snapshot.
+
+✅ Copy Snapshot
+
+EC2 → Snapshots → Select snapshot → Copy snapshot.
+
+Choose different region.
+
+Wait until completed.
+
+✅ In Destination Region
+
+Switch region (top right).
+
+Snapshots → Create volume from snapshot.
+
+Attach to EC2 in that region.
+
+Mount same way.
+
+🧠 SUPER SHORT MEMORY FLOW
+
+Create → Attach → lsblk → fdisk → mkfs → mkdir → mount → fstab → reboot → snapshot → copy.
+
+That’s entire Week 2.
+🌐 WEEK-5 – VPC (Step-by-Step Clean Version)
+
+Goal:
+
+Create:
+
+1 VPC
+
+1 Public Subnet
+
+Internet Gateway
+
+Route Table
+
+Launch EC2 in that VPC
+
+✅ STEP 1 – Create VPC
+
+Go to VPC Dashboard
+
+Click Create VPC
+
+Choose:
+
+VPC only
+
+Enter:
+
+Name: week5-vpc
+
+IPv4 CIDR block: 10.0.0.0/16
+
+Click Create
+
+✅ STEP 2 – Create Public Subnet
+
+Go to Subnets
+
+Click Create Subnet
+
+Select VPC → week5-vpc
+
+Enter:
+
+Subnet name: public-subnet
+
+AZ: choose any
+
+CIDR: 10.0.1.0/24
+
+Create
+
+✅ STEP 3 – Enable Auto Assign Public IP
+
+Select your subnet
+
+Click Actions → Edit subnet settings
+
+Enable:
+✔ Auto-assign public IPv4
+
+Save
+
+✅ STEP 4 – Create Internet Gateway
+
+Go to Internet Gateways
+
+Click Create
+
+Name: week5-igw
+
+Create
+
+Attach IGW to VPC
+
+Select IGW
+
+Click Actions → Attach to VPC
+
+Select week5-vpc
+
+Attach
+
+✅ STEP 5 – Create Route Table
+
+Go to Route Tables
+
+Click Create Route Table
+
+Name: public-rt
+
+Select week5-vpc
+
+Create
+
+Add Internet Route
+
+Select public-rt
+
+Go to Routes tab
+
+Click Edit routes
+
+Add route:
+
+Destination: 0.0.0.0/0
+
+Target: Internet Gateway
+
+Save
+
+Associate Route Table
+
+Go to Subnet associations
+
+Click Edit
+
+Select public-subnet
+
+Save
+
+✅ STEP 6 – Launch EC2 in Custom VPC
+
+Go to EC2 → Launch Instance
+
+Choose:
+
+Network → week5-vpc
+
+Subnet → public-subnet
+
+Auto assign public IP → Enabled
+
+Security Group:
+
+SSH (22) → My IP
+
+Launch
+
+✅ STEP 7 – Test
+
+SSH into EC2 using public IP.
+
+If it connects → VPC setup correct.
+🌐 WEEK 6 – VPC WITH BASTION SERVER
+🎯 Objective
+
+Create secure architecture:
+
+Internet
+↓
+Bastion Server (Public Subnet)
+↓
+Database Server (Private Subnet)
+
+Database should NOT be publicly accessible.
+
+✅ STEP 1 – Create VPC
+
+Go to VPC
+
+Click Create VPC
+
+Choose VPC only
+
+Enter:
+
+Name: week6-vpc
+
+CIDR: 10.0.0.0/16
+
+Create
+
+✅ STEP 2 – Create Subnets
+🔹 Public Subnet (Bastion)
+
+VPC → Subnets → Create
+
+VPC: week6-vpc
+
+Name: public-subnet
+
+CIDR: 10.0.1.0/24
+
+Create
+
+Enable Public IP:
+
+Select subnet
+
+Actions → Edit settings
+
+✔ Auto-assign public IPv4
+
+🔹 Private Subnet (Database)
+
+Create another subnet
+
+Name: private-subnet
+
+CIDR: 10.0.2.0/24
+
+Create
+
+Do NOT enable public IP.
+
+✅ STEP 3 – Create Internet Gateway
+
+VPC → Internet Gateways
+
+Create → Name: week6-igw
+
+Attach to week6-vpc
+
+✅ STEP 4 – Public Route Table
+
+VPC → Route Tables → Create
+
+Name: public-rt
+
+Select week6-vpc
+
+Create
+
+Add Route:
+
+Destination: 0.0.0.0/0
+
+Target: Internet Gateway
+
+Associate this route table with public-subnet.
+
+✅ STEP 5 – Security Groups (VERY IMPORTANT)
+🔹 Bastion Security Group
+
+Inbound:
+
+SSH (22) → My IP
+
+🔹 Database Security Group
+
+Inbound:
+
+SSH (22) → Source: Bastion Security Group
+(Best practice)
+OR
+
+SSH (22) → 10.0.1.0/24
+
+NO 0.0.0.0/0 here.
+
+✅ STEP 6 – Launch EC2 Instances
+🔹 Bastion Server
+
+AMI: Ubuntu
+
+Subnet: public-subnet
+
+Auto-assign public IP: Enabled
+
+Key pair: bastion.pem
+
+Security group: Bastion SG
+
+Launch.
+
+🔹 Database Server
+
+AMI: Ubuntu
+
+Subnet: private-subnet
+
+Auto-assign public IP: Disabled
+
+Key pair: dbserver.pem
+
+Security group: Database SG
+
+Launch.
+
+✅ STEP 7 – Copy DB Key to Bastion
+
+From your local machine:
+
+scp -i bastion.pem dbserver.pem ubuntu@<BASTION_PUBLIC_IP>:/home/ubuntu/
+
+Now dbserver.pem is inside bastion.
+
+✅ STEP 8 – Connect to Bastion
+ssh -i bastion.pem ubuntu@<BASTION_PUBLIC_IP>
+
+Check:
+
+ls
+
+You should see:
+
+bastion.pem
+
+dbserver.pem
+
+If permission error:
+
+chmod 400 dbserver.pem
+✅ STEP 9 – SSH from Bastion to Database
+
+Inside Bastion:
+
+ssh -i dbserver.pem ubuntu@10.0.2.x
+
+(Use private IP of DB server)
+
+If connected:
+
+ubuntu@ip-10-0-2-xx:~$
+
+SUCCESS.
+
+🎯 Security Result
+
+✔ Database has NO public IP
+✔ Cannot SSH directly from internet
+✔ Only Bastion can access it
+
+⚠️ Common Errors + Fix
+
+❌ Permission denied
+→ Run:
+
+chmod 400 dbserver.pem
+
+❌ Connection timed out
+→ Check DB security group allows SSH from Bastion SG
+
+❌ Bastion not connecting
+→ Check:
+
+Public IP exists
+
+Route table has IGW
+
+SSH allowed in SG
